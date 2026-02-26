@@ -1,0 +1,40 @@
+{
+  "name": "solana-agent-wallet",
+  "version": "1.0.0",
+  "description": "Autonomous AI agent wallet infrastructure on Solana devnet — multi-agent, policy-enforced, sandboxed",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "demo": "ts-node src/demo.ts",
+    "multi-agent": "ts-node src/multiAgent.ts",
+    "test": "ts-node tests/wallet.test.ts",
+    "generate-wallet": "ts-node scripts/generateWallet.ts"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0",
+    "@solana/spl-token": "^0.4.9",
+    "bs58": "^6.0.0",
+    "dotenv": "^16.4.7",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "table": "^6.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0",
+    "ts-node": "^10.9.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "solana",
+    "ai-agent",
+    "wallet",
+    "devnet",
+    "autonomous",
+    "stablecoin"
+  ],
+  "license": "MIT"
+}
