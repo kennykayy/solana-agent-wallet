@@ -181,8 +181,9 @@ test("exports valid base58 private key", () => {
   const pk = wallet.exportPrivateKey();
   expect(pk.length).toBeGreaterThan(40);
   // Should be valid base58 — can decode without error
-  const { decode } = require("bs58");
-  const decoded = decode(pk);
+  const bs58mod = require("bs58");
+  const decoder = bs58mod.default ?? bs58mod;
+  const decoded = decoder.decode(pk);
   expect(decoded.length).toBe(64); // Solana secret keys are 64 bytes
 });
 
