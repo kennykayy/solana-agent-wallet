@@ -64,7 +64,7 @@ export interface AgentWalletState {
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const DEFAULT_POLICY: SpendingPolicy = {
+export const DEFAULT_POLICY: SpendingPolicy = {
   maxTransactionLamports: 0.1 * LAMPORTS_PER_SOL,
   dailyLimitLamports: 0.3 * LAMPORTS_PER_SOL,
   requiresApproval: true,

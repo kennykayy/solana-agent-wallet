@@ -1,10 +1,3 @@
-/**
- * WalletManager — Fleet management for multiple autonomous agent wallets
- *
- * Handles creation, funding, monitoring, and lifecycle management
- * of a collection of AgentWallet instances on Solana devnet.
- */
-
 import {
   Connection,
   PublicKey,
@@ -13,7 +6,6 @@ import {
 } from "@solana/web3.js";
 import { AgentWallet, SpendingPolicy, WalletMetadata, DEFAULT_POLICY } from "./AgentWallet";
 
-// re-export DEFAULT_POLICY so other modules don't need to reach into AgentWallet
 export { DEFAULT_POLICY };
 
 export interface FleetSummary {
@@ -27,20 +19,19 @@ export interface FleetSummary {
 export class WalletManager {
   private wallets: Map<string, AgentWallet> = new Map();
   private connection: Connection;
-  private authorityKeypair?: Keypair; // Master funding wallet
+  private authorityKeypair?: Keypair;
 
   constructor(connection: Connection, authorityKeypair?: Keypair) {
     this.connection = connection;
     this.authorityKeypair = authorityKeypair;
   }
 
-  // ── Wallet Creation ───────────────────────────────────────────────────────
-
   createAgentWallet(
     agentId: string,
     agentName: string,
     role: string,
-    policy: SpendingPolicy = DEFAULT_POLICY
+    policy: SpendingPolicy = DEFAULT_POLICY,
+    existingKeypair?: Keypair
   ): AgentWallet {
     if (this.wallets.has(agentId)) {
       throw new Error(`Agent wallet with ID '${agentId}' already exists`);
@@ -54,7 +45,7 @@ export class WalletManager {
       policy,
     };
 
-    const wallet = new AgentWallet(this.connection, metadata);
+    const wallet = new AgentWallet(this.connection, metadata, existingKeypair);
     this.wallets.set(agentId, wallet);
     return wallet;
   }
@@ -72,8 +63,6 @@ export class WalletManager {
     );
   }
 
-  // ── Retrieval ─────────────────────────────────────────────────────────────
-
   getWallet(agentId: string): AgentWallet {
     const wallet = this.wallets.get(agentId);
     if (!wallet) throw new Error(`No wallet found for agent '${agentId}'`);
@@ -84,12 +73,6 @@ export class WalletManager {
     return Array.from(this.wallets.values());
   }
 
-  // ── Devnet Funding ────────────────────────────────────────────────────────
-
-  /**
-   * Fund a wallet using Solana's devnet airdrop faucet.
-   * Rate-limited: max 2 SOL per request per address.
-   */
   async airdropToAgent(agentId: string, solAmount: number = 1): Promise<string> {
     const wallet = this.getWallet(agentId);
     const lamports = Math.min(solAmount * LAMPORTS_PER_SOL, 2 * LAMPORTS_PER_SOL);
@@ -99,7 +82,6 @@ export class WalletManager {
       lamports
     );
 
-    // Wait for airdrop confirmation
     const { blockhash, lastValidBlockHeight } =
       await this.connection.getLatestBlockhash();
     await this.connection.confirmTransaction({
@@ -112,10 +94,6 @@ export class WalletManager {
     return signature;
   }
 
-  /**
-   * Fund multiple agents in sequence (devnet faucet rate limits apply).
-   * Adds a delay between requests to avoid 429 errors.
-   */
   async airdropToAllAgents(
     solPerAgent: number = 1,
     delayMs: number = 2000
@@ -132,8 +110,6 @@ export class WalletManager {
       }
     }
   }
-
-  // ── Monitoring ────────────────────────────────────────────────────────────
 
   async refreshAllBalances(): Promise<void> {
     await Promise.all(
@@ -159,21 +135,8 @@ export class WalletManager {
     };
   }
 
-  // ── Global Controls ───────────────────────────────────────────────────────
-
-  pauseAllAgents(): void {
-    this.wallets.forEach((w) => w.deactivate());
-  }
-
-  resumeAllAgents(): void {
-    this.wallets.forEach((w) => w.reactivate());
-  }
-
-  pauseAgent(agentId: string): void {
-    this.getWallet(agentId).deactivate();
-  }
-
-  resumeAgent(agentId: string): void {
-    this.getWallet(agentId).reactivate();
-  }
+  pauseAllAgents(): void { this.wallets.forEach((w) => w.deactivate()); }
+  resumeAllAgents(): void { this.wallets.forEach((w) => w.reactivate()); }
+  pauseAgent(agentId: string): void { this.getWallet(agentId).deactivate(); }
+  resumeAgent(agentId: string): void { this.getWallet(agentId).reactivate(); }
 }
