@@ -1,6 +1,13 @@
 # 🤖 Solana Agent Wallet
 
 **Autonomous AI agent wallet infrastructure on Solana devnet.**
+## Live Demo — Devnet Transactions
+
+| Demo | Transaction | Explorer |
+|------|-------------|----------|
+| Autonomous agent transfer | 33uQY4TDN... | [View on Solscan](https://solscan.io/tx/33uQY4TDNhD6dZXn96qmoJqFC9e341ZA3froySTic9rZS9BBCvijv7QTPLZ6mxZy1vtEoS3QesMh7mj36FmTNNCm?cluster=devnet) |
+
+**Agent wallet address:** `4ZUhZnjxTANEQDvtKuz1zREQ3R4jB16LwpuFB48NP5QY`
 
 Each agent gets its own keypair, signs transactions independently, and operates
 within enforced spending policies — no human intervention required.
